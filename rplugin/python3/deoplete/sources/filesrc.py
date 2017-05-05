@@ -30,7 +30,7 @@ class Source(Base):
 
         mtime = getmtime(self.__filepath)
         if mtime == self.__mtime:
-          return
+            return
 
         self.__mtime = mtime
         f = open(self.__filepath, 'r')
