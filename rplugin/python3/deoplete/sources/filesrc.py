@@ -5,11 +5,9 @@
 # ============================================================================
 
 from .base import Base
-from os.path import exists, getmtime
-
+from os.path import exists, getmtime, expandvars, expanduser
 
 class Source(Base):
-
     def __init__(self, vim):
         super().__init__(vim)
 
@@ -20,11 +18,10 @@ class Source(Base):
         self.__mtime = 0
 
     def on_init(self, context):
-        self.__filepath = context['vars'].get(
-            'deoplete#filesrc#path', '')
+        self.__filepath = expandvars(expanduser(
+            context['vars'].get('deoplete#filesrc#path', '')))
 
     def on_event(self, context):
-        self.__cache = []
         if not exists(self.__filepath):
             return
 
@@ -33,8 +30,8 @@ class Source(Base):
             return
 
         self.__mtime = mtime
-        f = open(self.__filepath, 'r')
-        self.__cache = list(f.read().split())
+        with open(self.__filepath, 'r') as f:
+            self.__cache = f.read().split()
 
     def gather_candidates(self, context):
         return self.__cache
